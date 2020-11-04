@@ -8,30 +8,39 @@ import UserInfo from './userInfo'
 import Actions from './actions'
 import Repos from './repos'
 
-const AppContent = ({ userinfo, repos, starred }) => (
+const AppContent = el => (
   <div className='app'>
-    <Seach />
-    {!!userinfo && <UserInfo userinfo={userinfo} />}
-    {!!userinfo && <Actions />}
+    <Seach handleSearch={el.handleSearch} />
+    {!!el.userprops && <UserInfo userprops={el.userprops} />}
 
-    {!!repos.length && <Repos
-      className='repos'
-      title='Repositórios'
-      repos={repos}
+    {!!el.userprops && <Actions
+      getRepos={el.getRepos}
+      getStarred={el.getStarred}
     />}
 
-    {!!starred.length && <Repos
+    {!!el.repos.length && <Repos
+      className='repos'
+      title='Repositórios'
+      repos={el.repos}
+    />}
+
+    {!!el.starred.length && <Repos
       className='starred'
       title='Favoritos'
-      repos={starred}
+      repos={el.starred}
     />}
   </div>
 )
 
 AppContent.propTypes = {
-  userinfo: PropTypes.object.isRequired,
-  repos: PropTypes.array.isRequired,
-  starred: PropTypes.array.isRequired
+  props: PropTypes.shape({
+    userprops: PropTypes.object,
+    repos: PropTypes.array.isRequired,
+    starred: PropTypes.array.isRequired,
+    handleSearch: PropTypes.func,
+    getRepos: PropTypes.func,
+    getStarred: PropTypes.func
+  })
 }
 
 export default AppContent

@@ -1,38 +1,61 @@
 'use strict'
 
 import React, { Component } from 'react'
-
+import ajax from '@fdaciuk/ajax'
 import AppContent from './components/appContent'
 
 class App extends Component {
   constructor() {
     super()
     this.state = {
-      userinfo: {
-        username: 'Raynon Messias',
-        photo: 'https://avatars3.githubusercontent.com/u/59324178?v=4',
-        login: 'raymessias',
-        repos: 12,
-        followers: 3,
-        following: 5
-      },
-      repos: [{
-        name: 'Repo',
-        link: '#'
-      }],
-      starred: [{
-        name: 'Repo2',
-        link: '#'
-      }]
+      userprops: null,
+      repos: [],
+      starred: []
     }
   }
 
+  handleSearch(e) {
+    const value = e.target.value
+    const keyCode = e.which || e.keyCode
+    const ENTER = 13
+    const url = `https://api.github.com/users/${value}`
+
+    if (keyCode === ENTER) {
+      ajax().get(url).then(result => {
+        this.setState({
+          userprops: {
+            login: result.login,
+            username: result.name,
+            photo: result.avatar_url,
+            repos: result.public_repos,
+            link: result.html_url,
+            followers: result.followers,
+            following: result.following
+          }
+        })
+      })
+    }
+  }
+
+  getRepos() {
+    console.log('get repos')
+  }
+
+  getStarred() {
+    console.log('get starred')
+  }
+
   render() {
-    return <AppContent
-      userinfo={this.state.userinfo}
-      repos={this.state.repos}
-      starred={this.state.starred}
-    />
+    return (
+      <AppContent
+        userprops={this.state.userprops}
+        repos={this.state.repos}
+        starred={this.state.starred}
+        handleSearch={e => this.handleSearch(e)}
+        getRepos={() => this.getRepos()}
+        getStarred={() => this.getStarred()}
+      />)
   }
 }
+
 export default App
