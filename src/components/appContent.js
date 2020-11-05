@@ -8,39 +8,46 @@ import UserInfo from './userInfo'
 import Actions from './actions'
 import Repos from './repos'
 
-const AppContent = el => (
+const AppContent = ({
+  userprops,
+  repos,
+  starred,
+  isFetching,
+  handleSearch,
+  getRepos,
+  getStarred
+}) => (
   <div className='app'>
-    <Seach handleSearch={el.handleSearch} />
-    {!!el.userprops && <UserInfo userprops={el.userprops} />}
-
-    {!!el.userprops && <Actions
-      getRepos={el.getRepos}
-      getStarred={el.getStarred}
+    <Seach isDisabled={isFetching} handleSearch={handleSearch} />
+    { isFetching && <div>Carregando...</div>}
+    {!!userprops && <UserInfo userprops={userprops} />}
+    {!!userprops && <Actions
+      getRepos={getRepos}
+      getStarred={getStarred}
     />}
 
-    {!!el.repos.length && <Repos
+    {!!repos.length && <Repos
       className='repos'
       title='Repositórios'
-      repos={el.repos}
+      repos={repos}
     />}
 
-    {!!el.starred.length && <Repos
+    {!!starred.length && <Repos
       className='starred'
       title='Favoritos'
-      repos={el.starred}
+      repos={starred}
     />}
   </div>
 )
 
 AppContent.propTypes = {
-  props: PropTypes.shape({
-    userprops: PropTypes.object,
-    repos: PropTypes.array.isRequired,
-    starred: PropTypes.array.isRequired,
-    handleSearch: PropTypes.func,
-    getRepos: PropTypes.func,
-    getStarred: PropTypes.func
-  })
+  userprops: PropTypes.object,
+  repos: PropTypes.array.isRequired,
+  starred: PropTypes.array.isRequired,
+  isFetching: PropTypes.bool.isRequired,
+  handleSearch: PropTypes.func.isRequired,
+  getRepos: PropTypes.func.isRequired,
+  getStarred: PropTypes.func.isRequired
 }
 
 export default AppContent
