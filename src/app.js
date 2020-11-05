@@ -14,35 +14,60 @@ class App extends Component {
     }
   }
 
+  getGitHubApi(username, type) {
+    const intUser = username ? `/${username}` : ''
+    const intType = type ? `/${type}` : ''
+    return `https://api.github.com/users${intUser}${intType}`
+  }
+
   handleSearch(e) {
-    const value = e.target.value
+    const target = e.target
     const keyCode = e.which || e.keyCode
     const ENTER = 13
-    const url = `https://api.github.com/users/${value}`
+
+    const url = this.getGitHubApi(target.value)
 
     if (keyCode === ENTER) {
-      ajax().get(url).then(result => {
-        this.setState({
-          userprops: {
-            login: result.login,
-            username: result.name,
-            photo: result.avatar_url,
-            repos: result.public_repos,
-            link: result.html_url,
-            followers: result.followers,
-            following: result.following
-          }
+      target.disabled = true
+      ajax()
+        .get(url)
+        .then(result => {
+          this.setState({
+            userprops: {
+              login: result.login,
+              username: result.name,
+              photo: result.avatar_url,
+              repos: result.public_repos,
+              link: result.html_url,
+              followers: result.followers,
+              following: result.following
+            },
+            repos: [],
+            starred: []
+          })
         })
-      })
+        .always(() => {
+          target.disabled = false
+        })
     }
   }
 
-  getRepos() {
-    console.log('get repos')
-  }
+  getRepos(type) {
+    return () => {
+      const username = this.state.userprops.login
+      const url = this.getGitHubApi(username, type)
 
-  getStarred() {
-    console.log('get starred')
+      ajax()
+        .get(url)
+        .then(result => {
+          this.setState({
+            [type]: result.map(elem => ({
+              name: elem.name,
+              link: elem.html_url
+            }))
+          })
+        })
+    }
   }
 
   render() {
@@ -52,8 +77,8 @@ class App extends Component {
         repos={this.state.repos}
         starred={this.state.starred}
         handleSearch={e => this.handleSearch(e)}
-        getRepos={() => this.getRepos()}
-        getStarred={() => this.getStarred()}
+        getRepos={this.getRepos('repos')}
+        getStarred={this.getRepos('starred')}
       />)
   }
 }
